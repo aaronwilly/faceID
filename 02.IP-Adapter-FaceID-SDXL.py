@@ -1,24 +1,49 @@
 import os
+
+# -------------------------------------------------------------------
+# Set cache dirs FIRST (before any import that uses Hugging Face / disk).
+# Use existing models_cache so nothing is downloaded to C:\
+# -------------------------------------------------------------------
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+MODELS_CACHE = os.path.join(PROJECT_DIR, "models_cache")
+os.makedirs(MODELS_CACHE, exist_ok=True)
+
+os.environ["HF_HOME"] = MODELS_CACHE
+os.environ["HUGGINGFACE_HUB_CACHE"] = MODELS_CACHE
+os.environ["HF_HUB_CACHE"] = MODELS_CACHE
+os.environ["TRANSFORMERS_CACHE"] = os.path.join(MODELS_CACHE, "transformers")
+os.environ["INSIGHTFACE_HOME"] = os.path.join(MODELS_CACHE, "insightface")
+
 from datetime import datetime
 
 import cv2
 import torch
+from diffusers import DDIMScheduler, StableDiffusionXLPipeline
 from insightface.app import FaceAnalysis
+from ip_adapter.ip_adapter_faceid import IPAdapterFaceIDXL
 
-app = FaceAnalysis(name="buffalo_l", providers=['CUDAExecutionProvider', 'CPUExecutionProvider'])
+app = FaceAnalysis(
+    name="buffalo_l",
+    root=os.environ["INSIGHTFACE_HOME"],
+    providers=['CUDAExecutionProvider', 'CPUExecutionProvider'],
+)
 app.prepare(ctx_id=0, det_size=(640, 640))
 
 image = cv2.imread("tailor.png")
+if image is None:
+    raise ValueError("Image not found or failed to load")
 faces = app.get(image)
+if len(faces) == 0:
+    raise ValueError("No face detected in image")
 
 faceid_embeds = torch.from_numpy(faces[0].normed_embedding).unsqueeze(0)
 
-from diffusers import DDIMScheduler, StableDiffusionXLPipeline
-
-from ip_adapter.ip_adapter_faceid import IPAdapterFaceIDXL
-
 base_model_path = "SG161222/RealVisXL_V3.0"
-ip_ckpt = "models/ip-adapter-faceid_sdxl.bin"
+ip_ckpt = os.path.join(MODELS_CACHE, "ip-adapter-faceid_sdxl.bin")
+if not os.path.isfile(ip_ckpt):
+    ip_ckpt = os.path.join(PROJECT_DIR, "models", "ip-adapter-faceid_sdxl.bin")
+if not os.path.isfile(ip_ckpt):
+    raise FileNotFoundError("IP-Adapter SDXL checkpoint not found. Put ip-adapter-faceid_sdxl.bin in models_cache/ or models/")
 device = "cuda"
 
 noise_scheduler = DDIMScheduler(
@@ -35,6 +60,7 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
     torch_dtype=torch.float16,
     scheduler=noise_scheduler,
     add_watermarker=False,
+    cache_dir=MODELS_CACHE,
 )
 
 # load ip-adapter
