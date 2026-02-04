@@ -1,0 +1,22 @@
+# Core
+torch>=2.0.0
+torchvision
+
+# Face analysis
+insightface>=0.7.0
+opencv-python-headless>=4.8.0
+onnxruntime-gpu  # or onnxruntime for CPU-only
+
+# Diffusion & IP-Adapter
+diffusers>=0.22.0
+transformers>=4.30.0
+safetensors>=0.4.0
+accelerate
+einops  # required by ip_adapter resampler
+
+# UI
+gradio>=4.0.0
+peft>=0.11.0
+# IP-Adapter (FaceID) - install from official repo
+# Run: pip install git+https://github.com/tencent-ailab/IP-Adapter.git
+# pip install torch==2.9.1 torchvision==0.24.1 torchaudio==2.9.1 --index-url https://download.pytorch.org/whl/cu126
