@@ -1,0 +1,15 @@
+# Same as requirements.txt but for offline install from wheels/
+# Install with: pip install --no-index --find-links wheels -r requirements-offline.txt
+# Then: pip install --no-index --find-links wheels ip_adapter
+torch>=2.0.0
+torchvision
+insightface>=0.7.0
+opencv-python-headless>=4.8.0
+onnxruntime-gpu
+diffusers>=0.22.0
+transformers>=4.30.0
+safetensors>=0.4.0
+accelerate
+einops
+gradio>=4.0.0
+peft>=0.11.0

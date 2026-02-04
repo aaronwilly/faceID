@@ -63,6 +63,7 @@ noise_scheduler = DDIMScheduler(
 vae = AutoencoderKL.from_pretrained(
     vae_model_path,
     cache_dir=MODELS_CACHE,
+    local_files_only=True,
 ).to(dtype=torch.float16)
 pipe = StableDiffusionPipeline.from_pretrained(
     base_model_path,
@@ -72,6 +73,7 @@ pipe = StableDiffusionPipeline.from_pretrained(
     feature_extractor=None,
     safety_checker=None,
     cache_dir=MODELS_CACHE,
+    local_files_only=True,
 )
 
 # load ip-adapter
@@ -104,7 +106,7 @@ for i, prompt in enumerate(prompts):
         width=512,
         height=768,
         num_inference_steps=30,
-        seed=2023 + i,
+        seed=223 + i,
     )
     img = images[0]
     path = os.path.join(results_dir, f"faceid_{timestamp}_{i:02d}.png")

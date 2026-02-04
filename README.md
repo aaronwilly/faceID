@@ -111,11 +111,36 @@ Common options for both:
 | `generate_faceid.py` | Generate with full IP-Adapter FaceID (`ip_adapter_faceid`) |
 | `generate_faceid_lora.py` | Generate with IP-Adapter + LoRA (`ip_adapter_faceid_separate`) |
 
+## Offline setup (wheels)
+
+To run **fully offline** (no internet after setup):
+
+1. **One-time, while online:** download all dependencies as wheels into `wheels/`:
+   ```powershell
+   # From project root, with venv activated
+   python scripts/download_wheels.py
+   ```
+   Or use PowerShell: `.\scripts\download_wheels.ps1`  
+   This downloads PyPI packages into `wheels/` and builds an IP-Adapter wheel from git.
+
+2. **Copy the project** (including the `wheels/` and `models_cache/` folders) to the offline machine.
+
+3. **On the offline machine:** create a venv and install from wheels only:
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\activate
+   python scripts/install_offline.py
+   ```
+   Or: `.\scripts\install_offline.ps1`  
+   This uses **only** the `wheels/` folder (no network).
+
+4. Put **models** (SD, VAE, IP-Adapter checkpoints, InsightFace) in `models_cache/` and use scripts with `local_files_only` / cache env vars so no model download occurs. Your existing scripts already point to `models_cache`.
+
 ## Requirements
 
 - Python 3.10+
 - ~8GB+ VRAM recommended for generation (or use `--cpu` for CPU)
-- Disk space for base model, VAE, and IP-Adapter weights
+- Disk space for base model, VAE, IP-Adapter weights, and (for offline) the `wheels/` folder
 
 ## License / use
 

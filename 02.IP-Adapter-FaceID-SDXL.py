@@ -61,6 +61,7 @@ pipe = StableDiffusionXLPipeline.from_pretrained(
     scheduler=noise_scheduler,
     add_watermarker=False,
     cache_dir=MODELS_CACHE,
+    local_files_only=True,
 )
 
 # load ip-adapter

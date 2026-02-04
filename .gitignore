@@ -11,7 +11,7 @@ __pycache__/
 venv/
 ENV/
 env/
-
+wheels
 # OS / editor
 .DS_Store
 Thumbs.db
